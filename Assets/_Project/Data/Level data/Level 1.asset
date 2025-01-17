@@ -15,3 +15,5 @@ MonoBehaviour:
   stageSceneNames:
   - Scene-1-1
   - Scene-1-2
+  stageOrbsToCollect: 2
+  currentLevel: 0

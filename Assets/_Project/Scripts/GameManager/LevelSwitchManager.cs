@@ -4,22 +4,28 @@ using UnityEngine.SceneManagement;
 public class LevelSwitchManager : MonoBehaviour
 {
     public LevelData currentLevelData; 
-    private int currentStageIndex = 0; 
+    private int currentStageIndex = 0;
+
+    private int _registeredOrbCount = 0;
+
+    public void RegisterOrbCollected()
+    {
+        _registeredOrbCount++;
+    }
 
     
     public void LoadNextStage()
     {
-        currentStageIndex++;
+        if(_registeredOrbCount == currentLevelData.stageOrbsToCollect)
+        {
+            currentStageIndex++;
         
-        LoadScene(currentLevelData.stageSceneNames[currentStageIndex]);
-
-        //if (currentStageIndex < currentLevelData.stageSceneNames.Count)
-        //{
-        //}
-        //else
-        //{
-        //    Debug.Log("Level complete! Use CompleteStage() to load the next level.");
-        //}
+            LoadScene(currentLevelData.stageSceneNames[currentStageIndex]);
+        }
+        else
+        {
+            Debug.Log("Not all orbs collected!");
+        }
     }
 
     
