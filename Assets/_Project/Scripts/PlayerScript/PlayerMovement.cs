@@ -11,6 +11,9 @@ public class PlayerMovement : MonoBehaviour
 
     private Vector2 _movement;
 
+    [Header("Animation")]
+    [SerializeField] private Animator _animator;
+
     private void Start()
     {
         _rb2D = GetComponent<Rigidbody2D>();
@@ -20,6 +23,14 @@ public class PlayerMovement : MonoBehaviour
     {
         _movement.x = Input.GetAxisRaw("Horizontal");
         _movement.y = Input.GetAxisRaw("Vertical");
+
+        bool isMoving = _movement.magnitude > 0;
+        _animator.SetBool("isMoving", isMoving);
+
+        if (_movement.x != 0)
+        {
+            transform.localScale = new Vector3(Mathf.Sign(_movement.x), 1, 1);
+        }
     }
 
     private void FixedUpdate()
