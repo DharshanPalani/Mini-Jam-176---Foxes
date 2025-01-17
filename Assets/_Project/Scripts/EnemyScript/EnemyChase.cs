@@ -1,3 +1,5 @@
+using System.Collections;
+using UnityEngine.Events;
 using UnityEngine;
 
 public class EnemyChase : MonoBehaviour
@@ -5,20 +7,23 @@ public class EnemyChase : MonoBehaviour
     [SerializeField] private float _fovRadius = 7f;
     [SerializeField] private float _chaseSpeed = 4f;
     [SerializeField] private float _lostPlayerTimeout = 2f;
+    [SerializeField] private float _frozenDelay = 1f;
+
+    [SerializeField] private UnityEvent _gunClickTriggerAudio;
+    [SerializeField] private UnityEvent _shootTrigger;
+    [SerializeField] private UnityEvent _startPatrol;
+    [SerializeField] private UnityEvent _stopPatrol;
 
     private bool _isChasing;
     private float _timeSinceLostPlayer;
     private Transform _player;
-    private EnemyPatrol _enemyPatrol;
-    private EnemyFreeze _enemyFreeze;
+    //private EnemyPatrol _enemyPatrol;
     private Rigidbody2D _rb;
 
     private void Start()
     {
         _player = GameObject.FindGameObjectWithTag("Player")?.transform;
         _rb = GetComponent<Rigidbody2D>();
-        _enemyPatrol = GetComponent<EnemyPatrol>();
-        _enemyFreeze = GetComponent<EnemyFreeze>();
 
         if (_player == null)
         {
@@ -39,6 +44,8 @@ public class EnemyChase : MonoBehaviour
         Vector2 direction = (_player.position - transform.position).normalized;
         _rb.MovePosition(_rb.position + direction * _chaseSpeed * Time.fixedDeltaTime);
 
+        _shootTrigger.Invoke();
+
         if (Vector2.Distance(transform.position, _player.position) > _fovRadius)
         {
             _timeSinceLostPlayer += Time.deltaTime;
@@ -55,13 +62,10 @@ public class EnemyChase : MonoBehaviour
 
     public void StartChasing()
     {
+        if(!_isChasing) _gunClickTriggerAudio.Invoke();
         _isChasing = true;
 
-        // Stop patrol when chasing starts
-        if (_enemyPatrol != null)
-        {
-            _enemyPatrol.StopPatrolling();
-        }
+        _stopPatrol.Invoke();
     }
 
     private void StopChasing()
@@ -69,11 +73,13 @@ public class EnemyChase : MonoBehaviour
         _isChasing = false;
         _timeSinceLostPlayer = 0f;
 
-        // Resume patrol when chasing ends
-        if (_enemyPatrol != null)
-        {
-            StartCoroutine(_enemyFreeze.Freeze());
-            _enemyPatrol.StartPatrolling();
-        }
+        StartCoroutine(Freeze());
+    }
+
+
+    public IEnumerator Freeze()
+    {
+        yield return new WaitForSeconds(_frozenDelay);
+        _startPatrol.Invoke();
     }
 }
