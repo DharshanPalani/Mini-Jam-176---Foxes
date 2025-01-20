@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: Level 1
   m_EditorClassIdentifier: 
   stageSceneNames:
-  - Scene-1-1
-  - Scene-1-2
-  stageOrbsToCollect: 2
+  - Scene-1 1
+  - Scene-1 2
+  - Scene-1 3
+  stageOrbsToCollect: 5
   currentLevel: 0

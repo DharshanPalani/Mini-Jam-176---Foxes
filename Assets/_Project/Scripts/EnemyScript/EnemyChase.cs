@@ -17,13 +17,18 @@ public class EnemyChase : MonoBehaviour
     private bool _isChasing;
     private float _timeSinceLostPlayer;
     private Transform _player;
-    //private EnemyPatrol _enemyPatrol;
+    private Animator _animator;
     private Rigidbody2D _rb;
 
     private void Start()
     {
         _player = GameObject.FindGameObjectWithTag("Player")?.transform;
         _rb = GetComponent<Rigidbody2D>();
+        _animator = GetComponent<Animator>();
+        if (_animator == null)
+        {
+            Debug.LogError("Animator component not found on the enemy chase");
+        }
 
         if (_player == null)
         {
@@ -62,7 +67,8 @@ public class EnemyChase : MonoBehaviour
 
     public void StartChasing()
     {
-        if(!_isChasing) _gunClickTriggerAudio.Invoke();
+        _animator.SetBool("isChasing", true);
+        if (!_isChasing) _gunClickTriggerAudio.Invoke();
         _isChasing = true;
 
         _stopPatrol.Invoke();
@@ -70,6 +76,8 @@ public class EnemyChase : MonoBehaviour
 
     private void StopChasing()
     {
+        _animator.SetBool("isChasing", false);
+        _animator.SetBool("isPatrolling", false);
         _isChasing = false;
         _timeSinceLostPlayer = 0f;
 

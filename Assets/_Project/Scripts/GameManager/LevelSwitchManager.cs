@@ -3,9 +3,7 @@ using UnityEngine.SceneManagement;
 
 public class LevelSwitchManager : MonoBehaviour
 {
-    public LevelData currentLevelData; 
-    private int currentStageIndex = 0;
-
+    public LevelData currentLevelData;
     private int _registeredOrbCount = 0;
 
     public void RegisterOrbCollected()
@@ -13,14 +11,22 @@ public class LevelSwitchManager : MonoBehaviour
         _registeredOrbCount++;
     }
 
-    
     public void LoadNextStage()
     {
-        if(_registeredOrbCount == currentLevelData.stageOrbsToCollect)
+        if (_registeredOrbCount >= currentLevelData.stageOrbsToCollect)
         {
-            currentStageIndex++;
-        
-            LoadScene(currentLevelData.stageSceneNames[currentStageIndex]);
+            string currentSceneName = SceneManager.GetActiveScene().name;
+            int currentSceneIndex = currentLevelData.stageSceneNames.IndexOf(currentSceneName);
+
+            if (currentSceneIndex >= 0 && currentSceneIndex < currentLevelData.stageSceneNames.Count - 1)
+            {
+                string nextSceneName = currentLevelData.stageSceneNames[currentSceneIndex + 1];
+                LoadScene(nextSceneName);
+            }
+            else
+            {
+                Debug.Log("No more stages to load!");
+            }
         }
         else
         {
@@ -28,19 +34,16 @@ public class LevelSwitchManager : MonoBehaviour
         }
     }
 
-    
     public void CompleteLevel()
     {
         SceneManager.LoadScene(currentLevelData.currentLevel + 1);
     }
 
-    
     public void RestartCurrentStage()
     {
-        LoadScene(currentLevelData.stageSceneNames[currentStageIndex]);
+        LoadScene(SceneManager.GetActiveScene().name);
     }
 
-    
     private void LoadScene(string sceneName)
     {
         if (Application.CanStreamedLevelBeLoaded(sceneName))

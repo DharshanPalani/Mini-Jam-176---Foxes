@@ -10,12 +10,20 @@ public class EnemyPatrol : MonoBehaviour
     private Vector2 _patrolCenter;
     private Vector2 _nextPatrolPoint;
     private bool _isMoving;
-    private bool _isPatrolling = true; // Flag to control patrol state
+    private bool _isPatrolling = true;
+    private Animator _animator;
 
     private void Start()
     {
         _patrolCenter = transform.position;
         SetNextPatrolPoint();
+
+        _animator = GetComponent<Animator>();
+
+        if (_animator == null)
+        {
+            Debug.LogError("Animator component not found on the enemy patrol");
+        }
     }
 
     private void Update()
@@ -35,19 +43,23 @@ public class EnemyPatrol : MonoBehaviour
     {
         _isMoving = true;
 
+
         while (Vector2.Distance(transform.position, _nextPatrolPoint) > 0.1f)
         {
             transform.position = Vector2.MoveTowards(transform.position, _nextPatrolPoint, _patrolSpeed * Time.deltaTime);
             yield return null;
         }
 
+        _animator.SetBool("isPatrolling", false);
+
         yield return new WaitForSeconds(_delayBetweenMoves);
+
+        _animator.SetBool("isPatrolling", true);
 
         SetNextPatrolPoint();
         _isMoving = false;
     }
 
-    // Public methods to control patrol state
     public void StartPatrolling()
     {
         _isPatrolling = true;
@@ -56,7 +68,7 @@ public class EnemyPatrol : MonoBehaviour
     public void StopPatrolling()
     {
         _isPatrolling = false;
-        StopAllCoroutines(); // Stop any ongoing movement
+        StopAllCoroutines();
         _isMoving = false;
     }
 }
